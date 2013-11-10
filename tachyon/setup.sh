@@ -4,4 +4,6 @@
 
 /root/tachyon/bin/format.sh
 
+sleep 1
+
 /root/tachyon/bin/start.sh all Mount
