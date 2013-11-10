@@ -4,7 +4,7 @@ pushd /root
 
 if [ -d "spark" ]; then
   echo "Spark seems to be installed. Exiting."
-  exit 0
+  return 0
 fi
 
 # Github tag:
@@ -18,7 +18,8 @@ then
   git remote add origin $repo
   git fetch origin
   git checkout $git_hash
-  sbt/sbt clean publish-local
+  sbt/sbt clean assembly
+  sbt/sbt publish-local
   popd
 
 # Pre-packaged spark version:
@@ -31,9 +32,16 @@ else
         wget http://d3kbcqa49mib13.cloudfront.net/spark-0.7.3-prebuilt-cdh4.tgz
       fi
       ;;    
+    0.8.0)
+      if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
+        wget http://d3kbcqa49mib13.cloudfront.net/spark-0.8.0-incubating-bin-hadoop1.tgz
+      else
+        wget http://d3kbcqa49mib13.cloudfront.net/spark-0.8.0-incubating-bin-cdh4.tgz
+      fi
+      ;;    
     *)
       echo "ERROR: Unknown Spark version"
-      exit -1
+      return -1
   esac
 
   echo "Unpacking Spark"
