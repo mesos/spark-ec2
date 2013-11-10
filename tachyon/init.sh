@@ -14,7 +14,7 @@ if [[ "$TACHYON_VERSION" == *\|* ]]
 then
   # Not yet supported
   echo ""
-# Pre-package shark version
+# Pre-package tachyon version
 else
   case "$TACHYON_VERSION" in
     0.3.0)
@@ -26,8 +26,8 @@ else
   esac
 
   echo "Unpacking Tachyon"
-  tar xvzf tachyon-*.tgz > /tmp/spark-ec2_tachyon.log
-  rm tachyon-*.tgz
+  tar xvzf tachyon-*.tar.gz > /tmp/spark-ec2_tachyon.log
+  rm tachyon-*.tar.gz
   mv `ls -d tachyon-*` tachyon
 fi
 
