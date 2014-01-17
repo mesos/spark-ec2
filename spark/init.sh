@@ -22,6 +22,16 @@ then
   sbt/sbt publish-local
   popd
 
+# Custom packaged spark version:
+elif [[ "$SPARK_VERSION" == *://* ]]
+then
+  wget -O spark-custom.tgz "$SPARK_VERSION"
+
+  echo "Unpacking Spark"
+  tar xvzf spark-custom.tgz > /tmp/spark-ec2_spark.log
+  rm spark-custom.tgz
+  mv `ls -d spark-* | grep -v ec2` spark
+
 # Pre-packaged spark version:
 else 
   case "$SPARK_VERSION" in
