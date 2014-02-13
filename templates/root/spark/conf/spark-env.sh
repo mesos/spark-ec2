@@ -17,7 +17,7 @@ export SCALA_HOME={{scala_home}}
 export SPARK_MEM={{default_spark_mem}}
 
 # Set JVM options and Spark Java properties
-SPARK_JAVA_OPTS+=" -Dspark.local.dir={{spark_local_dirs}}"
+SPARK_JAVA_OPTS+=" -Dspark.worker.timeout=600 -Dspark.local.dir={{spark_local_dirs}}"
 export SPARK_JAVA_OPTS
 
 export HADOOP_HOME="/root/ephemeral-hdfs"
