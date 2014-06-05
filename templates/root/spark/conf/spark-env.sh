@@ -26,7 +26,9 @@ export HADOOP_HOME="/root/ephemeral-hdfs"
 export SPARK_LIBRARY_PATH="/root/ephemeral-hdfs/lib/native/"
 export SPARK_MASTER_IP={{active_master}}
 export MASTER=`cat /root/spark-ec2/cluster-url`
-export SPARK_CLASSPATH=$SPARK_CLASSPATH":/root/ephemeral-hdfs/conf"
+
+# Include Spark's conf ahead of Hadoop's in order to get Spark's log4j if defined.
+export SPARK_CLASSPATH=$SPARK_CLASSPATH":/root/spark/conf:/root/ephemeral-hdfs/conf"
 
 export SPARK_WORKER_INSTANCES={{spark_worker_instances}}
 export SPARK_WORKER_CORES={{spark_worker_cores}}
