@@ -34,5 +34,7 @@ nosetests.xml
 .project
 .pydevproject
 
-# JetBrains products
-.idea/
+# Packer build log
+packer/build-spark-amis.log
+packer/spark-ami-artifact-ids.csv
+
