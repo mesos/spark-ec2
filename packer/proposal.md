@@ -54,6 +54,7 @@ Both benchmarks were run by launching Spark 1.1.0 clusters on EC2 with 1 master 
 Using the new, "pre-baked" AMIs cut the launch time down **from almost 10 minutes to under 4 minutes**. Further work can probably reduce this launch time even further.
 
 ### Current AMIs (single run)
+
 ```
  >>>    211s - SSH wait time
  >>>      0s - Initial setup
@@ -81,7 +82,39 @@ Using the new, "pre-baked" AMIs cut the launch time down **from almost 10 minute
  >>>    563s - Total
 ```
 
-### New AMIs - Latest OS updates and Spark 1.1.0 pre-installed (single run)
+### New AMIs
+
+#### Latest OS updates and Ganglia pre-installed (best run of 4)
+
+```
+ >>>     74s - SSH wait time
+ >>>      0s - Initial setup
+ >>>      8s - Run setup-slave on master
+ >>>      1s - Cluster SSH key approval
+ >>>      0s - rsync spark-ec2 to rest of cluster
+ >>>     14s - Run setup-slave on rest of cluster
+ >>>     11s - scala init
+ >>>     60s - spark init
+ >>>      0s - shark init
+ >>>     28s - ephemeral-hdfs init
+ >>>     19s - persistent-hdfs init
+ >>>      0s - spark-standalone init
+ >>>      8s - tachyon init
+ >>>      3s - ganglia init
+ >>>      1s - Deploy templates and config
+ >>>      4s - scala setup
+ >>>     22s - spark setup
+ >>>      2s - shark setup
+ >>>     14s - ephemeral-hdfs setup
+ >>>      6s - persistent-hdfs setup
+ >>>     29s - spark-standalone setup
+ >>>     10s - tachyon setup
+ >>>      3s - ganglia setup
+ >>>    325s - Total
+ ```
+
+#### Latest OS updates, Ganglia, and Spark 1.1.0 pre-installed (best run of 4)
+
 ```
  >>>     95s - SSH wait time
  >>>      0s - Initial setup
