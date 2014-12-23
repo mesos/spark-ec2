@@ -54,13 +54,15 @@ find . -regex "^.+.\(sh\|py\)" | xargs chmod a+x
 
 echo "RSYNC'ing /root/spark-ec2 to other cluster nodes..."
 rsync_start_time="$(date +'%s')"
-for node in $SLAVES $OTHER_MASTERS; do
-  echo $node
-  rsync -e "ssh $SSH_OPTS" -az /root/spark-ec2 $node:/root &
-  scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
-  sleep 0.1
-done
-wait
+parallel -q rsync -az -e "ssh $SSH_OPTS" /root/spark-ec2 {}:/root ::: $SLAVES $OTHER_MASTERS
+parallel scp $SSH_OPTS ~/.ssh/id_rsa {}:.ssh ::: $SLAVES $OTHER_MASTERS
+# for node in $SLAVES $OTHER_MASTERS; do
+#   echo $node
+  # rsync -e "ssh $SSH_OPTS" -az /root/spark-ec2 $node:/root &
+  # scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
+  # sleep 0.3
+# done
+# wait
 rsync_end_time="$(date +'%s')"
 echo_time_diff "rsync /root/spark-ec2" "$rsync_start_time" "$rsync_end_time"
 
