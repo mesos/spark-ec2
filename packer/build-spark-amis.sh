@@ -17,13 +17,6 @@ pushd "$(dirname "$0")" > /dev/null
 #+ and to an awk script that will filter in only the artifact IDs
 #+ for further processing.
 
-# NOTE: Currently, we have https://github.com/mitchellh/packer/pull/1402
-#+ manually merged in to get this working.
-
-# Remove these lines when you do the same.
-echo "Error: Manually merge in Packer PR #1402 and use the patched version to run this script." >&2
-exit 1
-
 packer build ./spark-packer.json -machine-readable \
     | tee "build-spark-amis.log" \
         >(
