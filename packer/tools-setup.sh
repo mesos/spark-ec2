@@ -2,6 +2,8 @@
 
 set -e
 
+sudo debuginfo-install -q -y kernel
+
 # sudo yum update -y  # this can be problematic
 sudo yum update -y --security  # security udpates only
 
