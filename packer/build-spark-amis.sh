@@ -28,8 +28,13 @@ packer build ./spark-packer.json -machine-readable \
         )
 
 ami_count=$(
-    wc -l "spark-ami-artifact-ids.csv" \
-    | awk -F " " '{ print $1 }'
+    awk -F "," '{
+        split($6, artifact_ids, "\\%\\!\\(PACKER\\_COMMA\\)")
+        
+        for (i in artifact_ids) {
+            print artifact_ids[i]
+        }
+    }' "./spark-ami-artifact-ids.csv" | wc -l | tr -d ' '
 )
 
 echo ""
