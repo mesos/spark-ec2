@@ -56,8 +56,8 @@ awk -F "," '{
         print " * " spark_version " > "  region " > " virtualization_type " > " ami_id
         
         # '\'' is just a convoluted way of passing a single quote to system()
-        system("mkdir -p '\''../ami-list/" spark_version "/" region "'\''")
-        system("echo '\''" ami_id "'\'' > '\''../ami-list/" spark_version "/" region "/" virtualization_type "'\''")
+        system("mkdir -p '\''../ami-list/" region "'\''")
+        system("echo '\''" ami_id "'\'' > '\''../ami-list/" region "/" virtualization_type "'\''")
     }
 }' "./spark-ami-artifact-ids.csv"
 
