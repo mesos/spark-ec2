@@ -11,6 +11,8 @@ fi
 set -e
 set -o pipefail
 
+build_start_time="$(date +'%s')"
+
 pushd "$(dirname "$0")" > /dev/null
 
 # Build the AMIs and simultaneously pipe the output to a log
@@ -40,6 +42,7 @@ ami_count=$(
 echo ""
 echo "Successfully registered the following $ami_count AMIs:"
 
+sort <(
 awk -F "," '{
     split($2, builder_name, ":")
     split($6, artifact_ids, "\\%\\!\\(PACKER\\_COMMA\\)")
@@ -53,12 +56,26 @@ awk -F "," '{
         region=a[1]
         ami_id=a[2]
         
-        print " * " spark_version " > "  region " > " virtualization_type " > " ami_id
+        print " * " region " > " virtualization_type " > " ami_id
         
         # '\'' is just a convoluted way of passing a single quote to system()
         system("mkdir -p '\''../ami-list/" region "'\''")
         system("echo '\''" ami_id "'\'' > '\''../ami-list/" region "/" virtualization_type "'\''")
     }
 }' "./spark-ami-artifact-ids.csv"
+)
 
 popd > /dev/null
+
+build_end_time="$(date +'%s')"
+
+diff_secs="$(($build_end_time-$build_start_time))"
+build_mins="$(($diff_secs / 60))"
+build_secs="$(($build_secs - $build_mins * 60))"
+
+echo ""
+echo "Build finished in: ${build_mins}m ${build_secs}s"
+
+# Not portable to BSD / OS X.
+# format='%Hh %Mm %Ss'
+# echo "Build finished in: $(date -u -d@"$diff_secs" +"$format")"
