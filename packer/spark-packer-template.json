@@ -65,7 +65,7 @@
         "./python-setup.sh",
         "../create_image.sh"
       ],
-      "pause_before": "10s"
+      "pause_before": "5s"
     }
   ]
 }

@@ -17,7 +17,7 @@ pushd "$(dirname "$0")" > /dev/null
 #+ and to an awk script that will filter in only the artifact IDs
 #+ for further processing.
 
-packer build ./spark-packer.json -machine-readable \
+packer build "./spark-packer-template.json" -machine-readable \
     | tee "build-spark-amis.log" \
         >(
             awk -F "," '{
