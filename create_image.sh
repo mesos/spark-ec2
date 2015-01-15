@@ -15,13 +15,13 @@ sudo yum install -y java-1.7.0-openjdk-devel gcc gcc-c++ ant git
 # Perf tools
 sudo yum install -y dstat iotop strace sysstat htop perf
 
-sudo yum-complete-transaction
+sudo yum-complete-transaction ; sleep 5
 sudo debuginfo-install -q -y glibc
 
-sudo yum-complete-transaction
-sudo debuginfo-install -q -y kernel
+# sudo yum-complete-transaction ; sleep 5
+# sudo debuginfo-install -q -y kernel
 
-sudo yum-complete-transaction
+sudo yum-complete-transaction ; sleep 5
 sudo yum --enablerepo='*-debug*' install -q -y java-1.7.0-openjdk-debuginfo.x86_64
 
 # PySpark and MLlib deps
