@@ -4,15 +4,26 @@ set -e
 
 sudo debuginfo-install -q -y kernel
 
+# Both of these can be problematic.
 # sudo yum update -y  # this can be problematic
-sudo yum update -y --security  # security udpates only
+# sudo yum update -y --security
 
 sudo yum install -y pssh git
 sudo yum install -y ganglia ganglia-web ganglia-gmond ganglia-gmetad
 sudo yum install -y xfsprogs
 
-pushd /etc/yum.repos.d/
-sudo wget http://download.opensuse.org/repositories/home:tange/CentOS_CentOS-5/home:tange.repo
-sudo yum install -y parallel
-echo "will cite" | parallel --bibtex
+# Install GNU parallel.
+pushd /tmp
+PARALLEL_VERSION="20141122"
+wget "http://ftpmirror.gnu.org/parallel/parallel-${PARALLEL_VERSION}.tar.bz2"
+bzip2 -dc "parallel-${PARALLEL_VERSION}.tar.bz2" | tar xvf -
+pushd "parallel-${PARALLEL_VERSION}"
+sudo ./configure
+sudo make
+sudo make install
 popd
+rm -rf "./parallel-${PARALLEL_VERSION}*"
+popd
+
+# Suppress citation notice.
+echo "will cite" | parallel --bibtex
