@@ -15,11 +15,19 @@ build_start_time="$(date +'%s')"
 
 pushd "$(dirname "$0")" > /dev/null
 
+# If jsmin is installed, use it to strip comments from the template.
+
+if [ $(command -v jsmin) ]; then
+    template='jsmin < "./spark-packer-template.json"'
+else
+    template='cat "./spark-packer-template.json"'
+fi
+
 # Build the AMIs and simultaneously pipe the output to a log
 #+ and to an awk script that will filter in only the artifact IDs
 #+ for further processing.
 
-packer build "./spark-packer-template.json" -machine-readable \
+packer build <(eval "$template") -machine-readable \
     | tee "build-spark-amis.log" \
         >(
             awk -F "," '{
