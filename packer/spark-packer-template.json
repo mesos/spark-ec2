@@ -61,6 +61,7 @@
       "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh -x '{{ .Path }}'",
       "scripts": [
         "./enable-root-login.sh",
+        "./os-setup.sh",
         "./tools-setup.sh",
         "./python-setup.sh",
         "../create_image.sh"
