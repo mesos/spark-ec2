@@ -62,9 +62,8 @@
       "scripts": [
         "./enable-root-login.sh",
         "./os-setup.sh",
-        "./tools-setup.sh",
         "./python-setup.sh",
-        "../create_image.sh"
+        "./tools-setup.sh"
       ],
       "pause_before": "5s"
     }
