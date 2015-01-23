@@ -8,7 +8,14 @@ if [ ! $(command -v packer) ]; then
     exit 1
 fi
 
-set -e
+function handle_error () {
+  echo "[error] Got a return code of $? on line $1." >&2
+  echo "[error] The build did not complete successfully." >&2
+  exit 1
+}
+
+trap 'handle_error $LINENO' ERR
+
 set -o pipefail
 
 build_start_time="$(date +'%s')"
@@ -79,10 +86,10 @@ build_end_time="$(date +'%s')"
 
 diff_secs="$(($build_end_time-$build_start_time))"
 build_mins="$(($diff_secs / 60))"
-build_secs="$(($build_secs - $build_mins * 60))"
+build_secs="$(($diff_secs - $build_mins * 60))"
 
 echo ""
-echo "Build finished in: ${build_mins}m ${build_secs}s"
+echo "Build completed successfully in: ${build_mins}m ${build_secs}s"
 
 # Not portable to BSD / OS X.
 # format='%Hh %Mm %Ss'
