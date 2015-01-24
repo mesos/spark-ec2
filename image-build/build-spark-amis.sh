@@ -1,10 +1,11 @@
 if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
-    echo "Error: Both AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be defined." >&2
+    echo "[error] Both AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be defined." >&2
     exit 1
 fi
 
 if [ ! $(command -v packer) ]; then
-    echo "Error: You do not appear to have packer installed." >&2
+    echo "[error] You do not appear to have packer installed." >&2
+    echo "[error] See: https://packer.io/downloads" >&2
     exit 1
 fi
 
@@ -24,7 +25,7 @@ pushd "$(dirname "$0")" > /dev/null
 
 # If jsmin is installed, use it to strip comments from the template.
 if [ $(command -v jsmin) ]; then
-    echo "Detected jsmin. Will use it to pre-process JSON template before handing it off to Packer."
+    echo "[info] Detected jsmin. Will use it to pre-process JSON template before handing it off to Packer."
     template='jsmin < "./spark-packer-template.json"'
 else
     template='cat "./spark-packer-template.json"'
