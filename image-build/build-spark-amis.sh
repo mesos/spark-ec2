@@ -23,8 +23,8 @@ build_start_time="$(date +'%s')"
 pushd "$(dirname "$0")" > /dev/null
 
 # If jsmin is installed, use it to strip comments from the template.
-
 if [ $(command -v jsmin) ]; then
+    echo "Detected jsmin. Will use it to pre-process JSON template before handing it off to Packer."
     template='jsmin < "./spark-packer-template.json"'
 else
     template='cat "./spark-packer-template.json"'
@@ -58,26 +58,26 @@ echo ""
 echo "Successfully registered the following $ami_count AMIs:"
 
 sort <(
-awk -F "," '{
-    split($2, builder_name, ":")
-    split($6, artifact_ids, "\\%\\!\\(PACKER\\_COMMA\\)")
-    
-    spark_version=builder_name[2]
-    virtualization_type=builder_name[5]
-    
-    for (i in artifact_ids) {
-        split(artifact_ids[i], a, ":")
+    awk -F "," '{
+        split($2, builder_name, ":")
+        split($6, artifact_ids, "\\%\\!\\(PACKER\\_COMMA\\)")
         
-        region=a[1]
-        ami_id=a[2]
+        spark_version=builder_name[2]
+        virtualization_type=builder_name[5]
         
-        print " * " region " > " virtualization_type " > " ami_id
-        
-        # '\'' is just a convoluted way of passing a single quote to system()
-        system("mkdir -p '\''../ami-list/" region "'\''")
-        system("echo '\''" ami_id "'\'' > '\''../ami-list/" region "/" virtualization_type "'\''")
-    }
-}' "./spark-ami-artifact-ids.csv"
+        for (i in artifact_ids) {
+            split(artifact_ids[i], a, ":")
+            
+            region=a[1]
+            ami_id=a[2]
+            
+            print " * " region " > " virtualization_type " > " ami_id
+            
+            # '\'' is just a convoluted way of passing a single quote to system()
+            system("mkdir -p '\''../ami-list/" region "'\''")
+            system("echo '\''" ami_id "'\'' > '\''../ami-list/" region "/" virtualization_type "'\''")
+        }
+    }' "./spark-ami-artifact-ids.csv"
 )
 
 popd > /dev/null
