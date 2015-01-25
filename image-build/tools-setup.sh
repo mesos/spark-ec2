@@ -6,15 +6,22 @@
 set -e
 
 if [ "$(id -u)" != "0" ]; then
-   echo "This script must be run as root" 1>&2
+   echo "This script must be run as root" >&2
    exit 1
 fi
 
 # Ganglia and misc tools
 sudo yum install -y pssh git
-sudo yum install -y ganglia ganglia-web ganglia-gmond ganglia-gmetad
 sudo yum install -y xfsprogs
 
+# Ganglia
+sudo yum install -y \
+  ganglia-3.6.0 \
+  ganglia-web-3.6.0 \
+  ganglia-gmond-3.6.0 \
+  ganglia-gmetad-3.6.0
+
+sudo yum install -y httpd-2.2.29
 
 # Install GNU parallel.
 {
@@ -45,10 +52,6 @@ sudo yum --enablerepo='*-debug*' install -q -y java-1.7.0-openjdk-debuginfo.x86_
 sudo yum install -y  python-matplotlib python-tornado scipy libgfortran
 # SparkR deps
 sudo yum install -y R
-# Other handy tools
-sudo yum install -y pssh
-# Ganglia
-sudo yum install -y ganglia ganglia-web ganglia-gmond ganglia-gmetad
 
 # Root ssh config
 sudo sed -i 's/PermitRootLogin.*/PermitRootLogin without-password/g' \
