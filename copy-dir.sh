@@ -42,9 +42,8 @@ SLAVES=`cat /root/spark-ec2/slaves`
 SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=5"
 
 echo "RSYNC'ing $DIR to slaves..."
-parallel --quote rsync -e "ssh $SSH_OPTS" -az $DELETE_FLAG "$DIR" "{}:$DEST" ::: $SLAVES
-# for slave in $SLAVES; do
-#     echo $slave
-#     rsync -e "ssh $SSH_OPTS" -az $DELETE_FLAG "$DIR" "$slave:$DEST" & sleep 0.5
-# done
-# wait
+for slave in $SLAVES; do
+    echo $slave
+    rsync -e "ssh $SSH_OPTS" -az $DELETE_FLAG "$DIR" "$slave:$DEST" & sleep 0.5
+done
+wait
