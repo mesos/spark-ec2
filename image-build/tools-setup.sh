@@ -74,14 +74,15 @@ done
 
 # Install Maven (for Hadoop)
 cd /tmp
-wget "http://archive.apache.org/dist/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.tar.gz"
-tar xvzf apache-maven-3.2.5-bin.tar.gz
-mv apache-maven-3.2.5 /opt/
+maven_version="3.2.5"
+wget "http://archive.apache.org/dist/maven/maven-3/${maven_version}/binaries/apache-maven-${maven_version}-bin.tar.gz"
+tar xvzf "apache-maven-${maven_version}-bin.tar.gz"
+mv "apache-maven-${maven_version}" /opt/
 
 # Edit bash profile
 echo "export PS1=\"\\u@\\h \\W]\\$ \"" >> ~/.bash_profile
 echo "export JAVA_HOME=/usr/lib/jvm/java-1.7.0" >> ~/.bash_profile
-echo "export M2_HOME=/opt/apache-maven-3.2.5" >> ~/.bash_profile
+echo "export M2_HOME=/opt/apache-maven-${maven_version}" >> ~/.bash_profile
 echo "export PATH=\$PATH:\$M2_HOME/bin" >> ~/.bash_profile
 
 source ~/.bash_profile
@@ -89,12 +90,13 @@ source ~/.bash_profile
 # Build Hadoop to install native libs
 sudo mkdir /root/hadoop-native
 cd /tmp
+hadoop_version="2.4.1"
 sudo yum install -y protobuf-compiler cmake openssl-devel
-wget "http://archive.apache.org/dist/hadoop/common/hadoop-2.4.1/hadoop-2.4.1-src.tar.gz"
-tar xvzf hadoop-2.4.1-src.tar.gz
-cd hadoop-2.4.1-src
+wget "http://archive.apache.org/dist/hadoop/common/hadoop-${hadoop_version}/hadoop-${hadoop_version}-src.tar.gz"
+tar xvzf "hadoop-${hadoop_version}-src.tar.gz"
+cd "hadoop-${hadoop_version}-src"
 mvn package -Pdist,native -DskipTests -Dtar
-sudo mv hadoop-dist/target/hadoop-2.4.1/lib/native/* /root/hadoop-native
+sudo mv "hadoop-dist/target/hadoop-${hadoop_version}/lib/native/"* /root/hadoop-native
 
 # Install Snappy lib (for Hadoop)
 yum install -y snappy
