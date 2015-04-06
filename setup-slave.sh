@@ -27,37 +27,48 @@ instance_type=$(curl http://169.254.169.254/latest/meta-data/instance-type 2> /d
 
 echo "Setting up slave on `hostname`... of type $instance_type"
 
+# Format & mount using ext4, which has the best performance among ext3, ext4, and xfs based
+# on our shuffle heavy benchmark
+function to_ext4 {
+  device=$1
+  mount_point=$2
+  trim_on=$3
+  EXT4_MOUNT_OPTS="defaults,noatime,nodiratime"
+
+  mkdir -p $mount_point
+  
+  if [[ trim_on == true ]]; then
+    echo $device $mount_point ' ext4 defaults,noatime,nodiratime,discard 0 0' >> /etc/fstab
+  fi
+
+  mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0 $device
+  mount -o $EXT4_MOUNT_OPTS $device $mount_point
+}
+
 if [[ $instance_type == r3* || $instance_type == i2* || $instance_type == hi1* ]]; then
   # Format & mount using ext4, which has the best performance among ext3, ext4, and xfs based
   # on our shuffle heavy benchmark
-  EXT4_MOUNT_OPTS="defaults,noatime,nodiratime"
   rm -rf /mnt*
-  mkdir /mnt
-  # To turn TRIM support on, uncomment the following line.
-  #echo '/dev/sdb /mnt  ext4  defaults,noatime,nodiratime,discard 0 0' >> /etc/fstab
-  mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0 /dev/sdb
-  mount -o $EXT4_MOUNT_OPTS /dev/sdb /mnt
+  device_array=(/dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg /dev/sdh /dev/sdi)
 
-  if [[ $instance_type == "r3.8xlarge" || $instance_type == "hi1.4xlarge" ]]; then
-    mkdir /mnt2
-    # To turn TRIM support on, uncomment the following line.
-    #echo '/dev/sdc /mnt2  ext4  defaults,noatime,nodiratime,discard 0 0' >> /etc/fstab
-    if [[ $instance_type == "r3.8xlarge" ]]; then
-      mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0 /dev/sdc      
-      mount -o $EXT4_MOUNT_OPTS /dev/sdc /mnt2
-    fi
-    # To turn TRIM support on, uncomment the following line.
-    #echo '/dev/sdf /mnt2  ext4  defaults,noatime,nodiratime,discard 0 0' >> /etc/fstab
-    if [[ $instance_type == "hi1.4xlarge" ]]; then
-      mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0 /dev/sdf      
-      mount -o $EXT4_MOUNT_OPTS /dev/sdf /mnt2
-    fi    
-  fi
+  total=${#device_array[*]}
+ 
+  # To turn TRIM support on, change the third argument to true
+  for (( i=0; i<=$(( $total - 1 )); i++ ))
+  do
+      case "$i" in
+        0) mount_index="" ;;
+        *) mount_index=$((i + 1)) ;;
+      esac
+      to_ext4 ${device_array[$i]} /mnt$mount_index false
+  done
 fi
 
 # Mount options to use for ext3 and xfs disks (the ephemeral disks
 # are ext3, but we use xfs for EBS volumes to format them faster)
 XFS_MOUNT_OPTS="defaults,noatime,nodiratime,allocsize=8m"
+
+yum install -q -y xfsprogs
 
 function setup_ebs_volume {
   device=$1
@@ -66,7 +77,6 @@ function setup_ebs_volume {
     # Check if device is already formatted
     if ! blkid $device; then
       mkdir $mount_point
-      yum install -q -y xfsprogs
       if mkfs.xfs -q $device; then
         mount -o $XFS_MOUNT_OPTS $device $mount_point
         chmod -R a+w $mount_point
@@ -87,15 +97,15 @@ function setup_ebs_volume {
   fi
 }
 
-# Format and mount EBS volume (/dev/sd[s, t, u, v, w, x, y, z]) as /vol[x] if the device exists
-setup_ebs_volume /dev/sds /vol0
-setup_ebs_volume /dev/sdt /vol1
-setup_ebs_volume /dev/sdu /vol2
-setup_ebs_volume /dev/sdv /vol3
-setup_ebs_volume /dev/sdw /vol4
-setup_ebs_volume /dev/sdx /vol5
-setup_ebs_volume /dev/sdy /vol6
-setup_ebs_volume /dev/sdz /vol7
+devices=(/dev/sds /dev/sdt /dev/sdu /dev/sdv /dev/sdw /dev/sdx /dev/sdy /dev/sdz)
+
+# Format and mount EBS volume (/dev/sd[s, t, u, v, w, x, y, z] as /vol[x] if the device exists
+total=${#devices[*]}
+ 
+for (( i=0; i<=$(( $total - 1 )); i++ ))
+do
+    setup_ebs_volume ${devices[$i]} /vol$i
+done
 
 # Alias vol to vol3 for backward compatibility: the old spark-ec2 script supports only attaching
 # one EBS volume at /dev/sdv.
