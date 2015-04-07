@@ -29,20 +29,28 @@ echo "Setting up slave on `hostname`... of type $instance_type"
 
 # Format & mount using ext4, which has the best performance among ext3, ext4, and xfs based
 # on our shuffle heavy benchmark
-function to_ext4 {
+function format_ext4 {
   device=$1
   mount_point=$2
   trim_on=$3
   EXT4_MOUNT_OPTS="defaults,noatime,nodiratime"
 
-  mkdir -p $mount_point
-  
-  if [[ trim_on == true ]]; then
-    echo $device $mount_point ' ext4 defaults,noatime,nodiratime,discard 0 0' >> /etc/fstab
-  fi
+  #check if device exists
+  if [[ -e "$device" ]]; then
+    #unmount the drive if it's mounted already
+    if grep -qs "$device" /proc/mounts; then
+      umount $mount_point
+    fi
 
-  mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0 $device
-  mount -o $EXT4_MOUNT_OPTS $device $mount_point
+    mkdir -p $mount_point
+  
+    if [[ trim_on == true ]]; then
+      echo $device $mount_point ' ext4 defaults,noatime,nodiratime,discard 0 0' >> /etc/fstab
+    fi
+
+    mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0 $device
+    mount -o $EXT4_MOUNT_OPTS $device $mount_point
+  fi
 }
 
 if [[ $instance_type == r3* || $instance_type == i2* || $instance_type == hi1* ]]; then
