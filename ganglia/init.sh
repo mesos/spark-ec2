@@ -8,6 +8,10 @@ rm -rf /mnt/ganglia/rrds/*
 mkdir -p /mnt/ganglia/rrds
 chown -R nobody:nobody /mnt/ganglia/rrds
 
+
+#Uninstall older version of ganglia if it was reinstalled in AMI
+ssh -t -t $SSH_OPTS root@$node "sudo yum remove -q -y httpd* php* ganglia ganglia-web ganglia-gmond ganglia-gmetad" & sleep 0.3
+
 # Install ganglia
 # TODO: Remove this once the AMI has ganglia by default
 
