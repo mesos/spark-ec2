@@ -11,7 +11,7 @@ chown -R nobody:nobody /mnt/ganglia/rrds
 # Install ganglia
 # TODO: Remove this once the AMI has ganglia by default
 
-GANGLIA_PACKAGES="httpd24-2.4 php56-common-5.6 ganglia-3.6 ganglia-web-3.5 ganglia-gmond-3.6 ganglia-gmetad-3.6"
+GANGLIA_PACKAGES="httpd24-2.4* php56-5.6* ganglia-3.6* ganglia-web-3.5* ganglia-gmond-3.6* ganglia-gmetad-3.6*"
 
 if ! rpm --quiet -q $GANGLIA_PACKAGES; then
   yum install -q -y $GANGLIA_PACKAGES;
